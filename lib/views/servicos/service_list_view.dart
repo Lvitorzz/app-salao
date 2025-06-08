@@ -1,3 +1,4 @@
+// lib/views/service/service_list_view.dart
 import 'package:flutter/material.dart';
 import '../../widgets/app_header.dart';
 import '../../controllers/service_controller.dart';
@@ -18,9 +19,12 @@ class _ServiceListViewState extends State<ServiceListView> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Excluir Serviço'),
-        content: Text('Excluir "${s.name}"?'),
+        content: Text('Deseja excluir "${s.name}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Não')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Não'),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () {
@@ -37,37 +41,85 @@ class _ServiceListViewState extends State<ServiceListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(title: 'Serviços'),
+      backgroundColor: const Color(0xFFF2E7C4),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF732027),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Serviços',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: StreamBuilder<List<Service>>(
         stream: ctl.allServices,
         builder: (ctx, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          if (snap.hasError) {
+            return const Center(
+              child: Text(
+                'Erro ao carregar serviços',
+                style: TextStyle(color: Color(0xFF591E18)),
+              ),
+            );
+          }
+          if (!snap.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
           final list = snap.data!;
-          if (list.isEmpty) return const Center(child: Text('Nenhum serviço cadastrado'));
-          return ListView.builder(
+          if (list.isEmpty) {
+            return const Center(
+              child: Text(
+                'Nenhum serviço cadastrado',
+                style: TextStyle(color: Color(0xFF591E18)),
+              ),
+            );
+          }
+          return ListView.separated(
             padding: const EdgeInsets.all(12),
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemCount: list.length,
             itemBuilder: (_, i) {
               final s = list[i];
               return Card(
+                color: const Color(0xFFF2D4C2),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
-                  leading: const Icon(Icons.build),
-                  title: Text(s.name),
-                  subtitle: Text('R\$ ${s.price.toStringAsFixed(2)}'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Icon(
+                    Icons.build,
+                    size: 32,
+                    color: const Color(0xFF732027),
+                  ),
+                  title: Text(
+                    s.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF591E18),
+                    ),
+                  ),
+                  subtitle: Text(
+                    'R\$ ${s.price.toStringAsFixed(2)}',
+                    style: const TextStyle(color: Color(0xFF591E18)),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit),
+                        color: const Color(0xFF732027),
                         onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => ServiceFormView(service: s)),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        icon: const Icon(Icons.delete),
+                        color: Colors.redAccent,
                         onPressed: () => _delete(s),
                       ),
                     ],
@@ -79,7 +131,8 @@ class _ServiceListViewState extends State<ServiceListView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+        backgroundColor: const Color(0xFF732027),
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const ServiceFormView()),

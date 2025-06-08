@@ -19,39 +19,38 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      // <— garante não ficar embaixo da status bar
-      bottom: false, // não adiciona padding na parte de baixo
+      bottom: false,
       child: Container(
         height: kToolbarHeight,
-        color: Colors.blue,
+        color: Color(0xFF732027),
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: onProfileTap,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage:
-                    imageUrl != null ? NetworkImage(imageUrl!) : null,
-                child:
-                    imageUrl == null
-                        ? const Icon(Icons.person, color: Colors.white)
-                        : null,
-              ),
+        child: Center(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            const Spacer(),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Spacer(flex: 2),
-          ],
+          ),
         ),
       ),
     );
   }
 }
+
+/*
+      Ícone de perfil — mantido aqui para reuso futuro:
+
+      GestureDetector(
+        onTap: onProfileTap,
+        child: CircleAvatar(
+          radius: 20,
+          backgroundImage:
+              imageUrl != null ? NetworkImage(imageUrl!) : null,
+          child: imageUrl == null
+              ? const Icon(Icons.person, color: Colors.white)
+              : null,
+        ),
+      ),
+*/

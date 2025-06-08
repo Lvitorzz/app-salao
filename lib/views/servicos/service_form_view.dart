@@ -1,5 +1,5 @@
+// lib/views/service/service_form_view.dart
 import 'package:flutter/material.dart';
-import '../../widgets/app_header.dart';
 import '../../controllers/service_controller.dart';
 import '../../models/service_model.dart';
 
@@ -30,8 +30,10 @@ class _ServiceFormViewState extends State<ServiceFormView> {
       name: _nameC.text.trim(),
       price: double.parse(_priceC.text),
     );
-    if (widget.service != null) ctl.update(s);
-    else ctl.add(s);
+    if (widget.service != null)
+      ctl.update(s);
+    else
+      ctl.add(s);
     Navigator.pop(context);
   }
 
@@ -39,32 +41,89 @@ class _ServiceFormViewState extends State<ServiceFormView> {
   Widget build(BuildContext context) {
     final isEdit = widget.service != null;
     return Scaffold(
-      appBar: AppHeader(title: isEdit ? 'Editar Serviço' : 'Cadastrar Serviço'),
+      backgroundColor: const Color(0xFFF2E7C4),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF732027),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          isEdit ? 'Editar Serviço' : 'Cadastrar Serviço',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
             children: [
-              TextFormField(
+              _buildField(
                 controller: _nameC,
-                decoration: const InputDecoration(labelText: 'Nome'),
+                label: 'Nome',
                 validator: (v) => v == null || v.isEmpty ? 'Informe o nome' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
+              _buildField(
                 controller: _priceC,
-                decoration: const InputDecoration(labelText: 'Preço'),
+                label: 'Preço',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 validator: (v) {
                   final n = double.tryParse(v ?? '');
-                  return n == null || n < 0 ? 'Preço inválido' : null;
+                  return (n == null || n < 0) ? 'Preço inválido' : null;
                 },
               ),
               const SizedBox(height: 24),
-              ElevatedButton(onPressed: _save, child: Text(isEdit ? 'Salvar' : 'Adicionar')),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF732027),
+                    foregroundColor: const Color(0xFFF2E7C4),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  onPressed: _save,
+                  child: Text(
+                    isEdit ? 'Salvar' : 'Adicionar',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required String label,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Color(0xFF591E18)),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFA67C6D)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF732027)),
         ),
       ),
     );

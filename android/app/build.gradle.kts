@@ -1,7 +1,6 @@
 // android/app/build.gradle.kts
 import java.util.Properties
 import java.io.FileInputStream
-import org.gradle.api.GradleException
 
 plugins {
   id("com.android.application")
@@ -10,13 +9,13 @@ plugins {
   id("com.google.gms.google-services")
 }
 
-// CARREGA key.properties que está em android/key.properties
-val keystorePropertiesFile = rootProject.file("key.properties")
-if (!keystorePropertiesFile.exists()) {
-  throw GradleException("Arquivo key.properties não encontrado em ${keystorePropertiesFile.path}")
-}
-val keystoreProperties = Properties().apply {
-  load(FileInputStream(keystorePropertiesFile))
+// Carregamento condicional do key.properties
+val keystoreProperties = Properties()
+val keystoreFile = rootProject.file("key.properties")
+val hasKeystore = keystoreFile.exists()
+
+if (hasKeystore) {
+  keystoreProperties.load(FileInputStream(keystoreFile))
 }
 
 android {
@@ -35,24 +34,30 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
+
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_11.toString()
   }
 
   signingConfigs {
-    create("release") {
-      keyAlias     = keystoreProperties["keyAlias"]    as String
-      keyPassword  = keystoreProperties["keyPassword"] as String
-      // storeFile deve apontar para android/meu_keystore.jks
-      storeFile    = rootProject.file(keystoreProperties["storeFile"] as String)
-      storePassword= keystoreProperties["storePassword"] as String
+    create("release").apply {
+      if (hasKeystore) {
+        keyAlias = keystoreProperties["keyAlias"] as String
+        keyPassword = keystoreProperties["keyPassword"] as String
+        storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
+        storePassword = keystoreProperties["storePassword"] as String
+      }
     }
   }
+
   buildTypes {
     getByName("release") {
-      signingConfig    = signingConfigs.getByName("release")
-      isMinifyEnabled  = false
-      isShrinkResources= false
+      // Só aplica assinatura se o arquivo existir
+      if (hasKeystore) {
+        signingConfig = signingConfigs.getByName("release")
+      }
+      isMinifyEnabled = false
+      isShrinkResources = false
     }
   }
 }

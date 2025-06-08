@@ -6,7 +6,6 @@ import 'package:gestao_salao/views/expense/expense_form_view.dart';
 import 'package:gestao_salao/views/receipts/receipt_form_view.dart';
 import 'package:gestao_salao/views/appointments/schedule_form_view.dart';
 import 'package:gestao_salao/views/appointments/schedule_list_view.dart';
-import '../../widgets/app_header.dart';
 import '../../widgets/app_bottom_navigation.dart';
 import '../products/product_list_view.dart';
 import '../products/product_form_view.dart';
@@ -22,51 +21,34 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _navIndex = 0;
 
-
-  void _goToProductForm() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ProductFormView()),
-  );
-
-  void _goToProductList() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ProductListView()),
-  );
-
-  void _goToServiceForm() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ServiceFormView()),
-  );
-
-  void _goToServiceList() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ServiceListView()),
-  );
-
-  void _goToScheduleForm() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ScheduleFormView()),
-  );
-
-  void _goToScheduleList() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ScheduleListView()),
-  );
-
-  void _goToClientForm() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ClientFormView()),
-  );
-
-  void _goToClientList() => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ClientListView()),
-  );
+  void _goToProductForm()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductFormView()));
+  void _goToProductList()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductListView()));
+  void _goToServiceForm()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceFormView()));
+  void _goToServiceList()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceListView()));
+  void _goToScheduleForm()  => Navigator.push(context, MaterialPageRoute(builder: (_) => const ScheduleFormView()));
+  void _goToScheduleList()  => Navigator.push(context, MaterialPageRoute(builder: (_) => const ScheduleListView()));
+  void _goToClientForm()    => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientFormView()));
+  void _goToClientList()    => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientListView()));
+  void _goToReceiptForm()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReceiptFormView()));
+  void _goToExpenseForm()   => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExpenseFormView()));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppHeader(title: 'Início'),
+      backgroundColor: const Color(0xFFF2E7C4),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,  // ← remove o botão de voltar
+        backgroundColor: const Color(0xFF732027),
+        centerTitle: true,
+        title: const Text(
+          'Início',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -74,7 +56,11 @@ class _HomePageState extends State<HomePage> {
           children: [
             const Text(
               'O que deseja fazer?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF591E18),
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -82,82 +68,47 @@ class _HomePageState extends State<HomePage> {
                 crossAxisCount: 4,
                 childAspectRatio: 0.7,
                 children: [
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.add_shopping_cart,
+                    label: 'Cadastrar\nProduto',
                     onTap: _goToProductForm,
-                    child: const _GridItem(
-                      icon: Icons.add_shopping_cart,
-                      label: 'Cadastrar\nProduto',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.build,
+                    label: 'Cadastrar\nServiço',
                     onTap: _goToServiceForm,
-                    child: const _GridItem(
-                      icon: Icons.build,
-                      label: 'Cadastrar\nServiço',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.schedule,
+                    label: 'Agendar\nServiço',
                     onTap: _goToScheduleForm,
-                    child: const _GridItem(
-                      icon: Icons.schedule,
-                      label: 'Agendar\nServiço',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.person_add,
+                    label: 'Cadastrar\nClientes',
                     onTap: _goToClientForm,
-                    child: const _GridItem(
-                      icon: Icons.person_add,
-                      label: 'Cadastrar\nClientes',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.list,
+                    label: 'Listar\nProduto',
                     onTap: _goToProductList,
-                    child: const _GridItem(
-                      icon: Icons.list,
-                      label: 'Listar\nProduto',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.list_alt,
+                    label: 'Listar\nServiço',
                     onTap: _goToServiceList,
-                    child: const _GridItem(
-                      icon: Icons.list_alt,
-                      label: 'Listar\nServiço',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.event_note,
+                    label: 'Listar\nAgendamentos',
                     onTap: _goToScheduleList,
-                    child: const _GridItem(
-                      icon: Icons.event_note,
-                      label: 'Listar\nAgendamentos',
-                    ),
                   ),
-                  GestureDetector(
+                  _GridItem(
+                    icon: Icons.people,
+                    label: 'Listar\nClientes',
                     onTap: _goToClientList,
-                    child: const _GridItem(
-                      icon: Icons.people,
-                      label: 'Listar\nClientes',
-                    ),
                   ),
                 ],
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ReceiptFormView()),
-                  );
-                },
-                child: const Text('Nova Receita'),
               ),
             ),
             const SizedBox(height: 8),
@@ -165,19 +116,35 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  backgroundColor: const Color(0xFF732027),
+                  foregroundColor: const Color(0xFFF2E7C4),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ExpenseFormView()),
-                  );
-                },
-                child: const Text('Nova Despesa'),
+                onPressed: _goToReceiptForm,
+                child: const Text(
+                  'Nova Receita',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFA67C6D),
+                  foregroundColor: const Color(0xFFF2E7C4),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                onPressed: _goToExpenseForm,
+                child: const Text(
+                  'Nova Despesa',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -194,22 +161,52 @@ class _HomePageState extends State<HomePage> {
 class _GridItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _GridItem({Key? key, required this.icon, required this.label})
-    : super(key: key);
+  final VoidCallback onTap;
+
+  const _GridItem({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: Colors.grey[300],
-          child: Icon(icon, size: 28, color: Colors.black54),
-        ),
-        const SizedBox(height: 8),
-        Text(label, textAlign: TextAlign.center),
-      ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      splashColor: const Color(0xFF732027).withOpacity(0.1),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2D4C2),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(icon, size: 28, color: const Color(0xFF732027)),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF591E18),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

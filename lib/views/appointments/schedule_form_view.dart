@@ -34,14 +34,12 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
   @override
   void initState() {
     super.initState();
-    // carrega clientes
     _cliCtl.allClients.listen((list) {
       setState(() {
         _clients = list;
         _loadingClients = false;
       });
     });
-    // se estiver editando, pré-carrega valores
     final appt = widget.appointment;
     if (appt != null) {
       _selectedServiceId = appt.serviceId;
@@ -79,25 +77,30 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nome')),
-            TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Telefone')),
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Nome'),
+            ),
+            TextField(
+              controller: phoneCtrl,
+              decoration: const InputDecoration(labelText: 'Telefone'),
+            ),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF732027)),
             onPressed: () async {
               if (nameCtrl.text.isEmpty || phoneCtrl.text.isEmpty) return;
               final doc = await FirebaseFirestore.instance.collection('clients').add({
                 'name': nameCtrl.text.trim(),
                 'phone': phoneCtrl.text.trim(),
               });
-              setState(() {
-                _selectedClientId = doc.id;
-              });
+              setState(() => _selectedClientId = doc.id);
               Navigator.pop(context);
             },
-            child: const Text('Salvar'),
+            child: const Text('Salvar', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -118,7 +121,6 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
     );
 
     if (widget.appointment != null) {
-      // atualização
       final orig = widget.appointment!;
       final updated = Appointment(
         id: orig.id,
@@ -131,7 +133,6 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
       );
       await _apptCtl.update(updated);
     } else {
-      // novo agendamento
       final newAppt = Appointment(
         id: '',
         serviceId: service.id,
@@ -143,7 +144,6 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
       );
       await _apptCtl.add(newAppt);
     }
-
     Navigator.pop(context);
   }
 
@@ -151,7 +151,18 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
   Widget build(BuildContext context) {
     final isEdit = widget.appointment != null;
     return Scaffold(
-      appBar: AppHeader(title: isEdit ? 'Editar Agendamento' : 'Agendar Serviço'),
+      backgroundColor: const Color(0xFFF2E7C4),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF732027),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          isEdit ? 'Editar Agendamento' : 'Agendar Serviço',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -166,40 +177,47 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
                   return DropdownButtonFormField<String>(
                     value: _selectedServiceId,
                     items: snap.data!
-                        .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name)))
+                        .map((s) => DropdownMenuItem(
+                      value: s.id,
+                      child: Text(s.name, style: const TextStyle(color: Color(0xFF591E18))),
+                    ))
                         .toList(),
-                    decoration: const InputDecoration(labelText: 'Serviço'),
+                    decoration: _inputDecoration('Serviço'),
                     onChanged: isEdit ? null : (v) => setState(() => _selectedServiceId = v),
                     validator: (v) => v == null ? 'Selecione um serviço' : null,
                   );
                 },
               ),
               const SizedBox(height: 12),
-
               // Cliente
               _loadingClients
                   ? const CircularProgressIndicator()
                   : DropdownButtonFormField<String>(
-                      value: _selectedClientId,
-                      items: [
-                        ..._clients.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))),
-                        if (!isEdit)
-                          const DropdownMenuItem(value: 'new', child: Text('Novo Cliente')),
-                      ],
-                      decoration: const InputDecoration(labelText: 'Cliente'),
-                      onChanged: isEdit
-                          ? null
-                          : (v) {
-                              if (v == 'new') {
-                                _addNewClient();
-                              } else {
-                                setState(() => _selectedClientId = v);
-                              }
-                            },
-                      validator: (v) => v == null ? 'Selecione o cliente' : null,
+                value: _selectedClientId,
+                items: [
+                  ..._clients.map((c) => DropdownMenuItem(
+                    value: c.id,
+                    child: Text(c.name, style: const TextStyle(color: Color(0xFF591E18))),
+                  )),
+                  if (!isEdit)
+                    const DropdownMenuItem(
+                      value: 'new',
+                      child: Text('Novo Cliente', style: TextStyle(color: Color(0xFF591E18))),
                     ),
+                ],
+                decoration: _inputDecoration('Cliente'),
+                onChanged: isEdit
+                    ? null
+                    : (v) {
+                  if (v == 'new') {
+                    _addNewClient();
+                  } else {
+                    setState(() => _selectedClientId = v);
+                  }
+                },
+                validator: (v) => v == null ? 'Selecione o cliente' : null,
+              ),
               const SizedBox(height: 12),
-
               // Data e Hora
               Row(
                 children: [
@@ -207,11 +225,12 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
                     child: InkWell(
                       onTap: _pickDate,
                       child: InputDecorator(
-                        decoration: const InputDecoration(labelText: 'Data'),
+                        decoration: _inputDecoration('Data'),
                         child: Text(
                           _selectedDate == null
                               ? 'Selecione'
                               : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                          style: const TextStyle(color: Color(0xFF591E18)),
                         ),
                       ),
                     ),
@@ -221,9 +240,10 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
                     child: InkWell(
                       onTap: _pickTime,
                       child: InputDecorator(
-                        decoration: const InputDecoration(labelText: 'Hora'),
+                        decoration: _inputDecoration('Hora'),
                         child: Text(
                           _selectedTime == null ? 'Selecione' : _selectedTime!.format(context),
+                          style: const TextStyle(color: Color(0xFF591E18)),
                         ),
                       ),
                     ),
@@ -231,18 +251,45 @@ class _ScheduleFormViewState extends State<ScheduleFormView> {
                 ],
               ),
               const Spacer(),
-
-              // Botão
+              // Botão Agendar/Salvar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _save,
-                  child: Text(isEdit ? 'Salvar' : 'Agendar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF732027),
+                    foregroundColor: const Color(0xFFF2E7C4),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    isEdit ? 'Salvar' : 'Agendar',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Color(0xFF591E18)),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFA67C6D)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFF732027)),
       ),
     );
   }

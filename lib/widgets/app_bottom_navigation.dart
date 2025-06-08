@@ -17,7 +17,7 @@ class AppBottomNavigation extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.blue,
+        color: Color(0xFF732027),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
