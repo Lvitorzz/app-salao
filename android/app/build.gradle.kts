@@ -1,21 +1,19 @@
 // android/app/build.gradle.kts
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
   id("com.android.application")
-  id("kotlin-android")
-  id("dev.flutter.flutter-gradle-plugin")
+  id("org.jetbrains.kotlin.android")
   id("com.google.gms.google-services")
+  id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Carregamento condicional do key.properties
-val keystoreProperties = Properties()
-val keystoreFile = rootProject.file("key.properties")
-val hasKeystore = keystoreFile.exists()
-
-if (hasKeystore) {
-  keystoreProperties.load(FileInputStream(keystoreFile))
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+  if (keystorePropertiesFile.exists()) {
+    load(FileInputStream(keystorePropertiesFile))
+  }
 }
 
 android {
@@ -40,24 +38,25 @@ android {
   }
 
   signingConfigs {
-    create("release").apply {
-      if (hasKeystore) {
-        keyAlias = keystoreProperties["keyAlias"] as String
-        keyPassword = keystoreProperties["keyPassword"] as String
-        storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
-        storePassword = keystoreProperties["storePassword"] as String
+    create("release") {
+      keyAlias = keystoreProperties["keyAlias"] as String?
+      keyPassword = keystoreProperties["keyPassword"] as String?
+      keystoreProperties["storeFile"]?.let { sf ->
+        storeFile = file(sf as String)
       }
+      storePassword = keystoreProperties["storePassword"] as String?
     }
   }
 
   buildTypes {
     getByName("release") {
-      // Só aplica assinatura se o arquivo existir
-      if (hasKeystore) {
-        signingConfig = signingConfigs.getByName("release")
-      }
-      isMinifyEnabled = false
-      isShrinkResources = false
+      signingConfig = signingConfigs.getByName("release")
+      // Se você usar ProGuard/R8, habilite e configure abaixo:
+      // isMinifyEnabled = true
+      // proguardFiles(
+      //     getDefaultProguardFile("proguard-android-optimize.txt"),
+      //     "proguard-rules.pro"
+      // )
     }
   }
 }

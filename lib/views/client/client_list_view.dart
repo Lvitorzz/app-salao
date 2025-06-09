@@ -1,6 +1,5 @@
 // lib/views/client/client_list_view.dart
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/app_header.dart';
 import '../../controllers/client_controller.dart';
 import '../../models/client_model.dart';
@@ -42,21 +41,6 @@ class _ClientListViewState extends State<ClientListView> {
       await ctl.delete(c.id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cliente excluído')),
-      );
-    }
-  }
-
-  Future<void> _remindClient(Client c) async {
-    // Remove tudo que não for número e monta a URL
-    final phone = c.phone.replaceAll(RegExp(r'[^0-9]'), '');
-    final text  = Uri.encodeComponent('Olá ${c.name}, lembrete do seu próximo agendamento!');
-    final uri   = Uri.parse('https://wa.me/$phone?text=$text');
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível abrir o WhatsApp')),
       );
     }
   }
@@ -103,10 +87,12 @@ class _ClientListViewState extends State<ClientListView> {
                 children: [
                   Text('Telefone: ${c.phone}', style: const TextStyle(color: Color(0xFF591E18))),
                   const SizedBox(height: 8),
-                  const Text('Observações:', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
+                  const Text('Observações:',
+                      style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
                   Text(notesText, style: const TextStyle(color: Color(0xFF591E18))),
                   const SizedBox(height: 12),
-                  const Text('Produtos:', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
+                  const Text('Produtos:',
+                      style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
                   if (clientProducts.isEmpty)
                     const Text('- Nenhum', style: TextStyle(color: Color(0xFF591E18))),
                   ...clientProducts.map((p) => Padding(
@@ -114,7 +100,8 @@ class _ClientListViewState extends State<ClientListView> {
                     child: Text('• ${p.name}', style: const TextStyle(color: Color(0xFF591E18))),
                   )),
                   const SizedBox(height: 12),
-                  const Text('Serviços:', style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
+                  const Text('Serviços:',
+                      style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF732027))),
                   if (clientServices.isEmpty)
                     const Text('- Nenhum', style: TextStyle(color: Color(0xFF591E18))),
                   ...clientServices.map((s) => Padding(
@@ -129,18 +116,13 @@ class _ClientListViewState extends State<ClientListView> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Fechar', style: TextStyle(color: Color(0xFF732027))),
               ),
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _remindClient(c);
-                },
-                icon: const Icon(Icons.message, color: Color(0xFF732027)),
-                label: const Text('Lembrar cliente', style: TextStyle(color: Color(0xFF732027))),
-              ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => ClientFormView(client: c)));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ClientFormView(client: c)),
+                  );
                 },
                 child: const Text('Editar', style: TextStyle(color: Color(0xFF732027))),
               ),
@@ -169,14 +151,16 @@ class _ClientListViewState extends State<ClientListView> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Clientes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Clientes',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: StreamBuilder<List<Client>>(
         stream: ctl.allClients,
         builder: (ctx, snap) {
           if (snap.hasError) {
             return const Center(
-              child: Text('Erro ao carregar clientes', style: TextStyle(color: Color(0xFF591E18))),
+              child: Text('Erro ao carregar clientes',
+                  style: TextStyle(color: Color(0xFF591E18))),
             );
           }
           if (!snap.hasData) {
@@ -185,7 +169,8 @@ class _ClientListViewState extends State<ClientListView> {
           final list = snap.data!;
           if (list.isEmpty) {
             return const Center(
-              child: Text('Nenhum cliente cadastrado', style: TextStyle(color: Color(0xFF591E18))),
+              child: Text('Nenhum cliente cadastrado',
+                  style: TextStyle(color: Color(0xFF591E18))),
             );
           }
           return ListView.separated(
@@ -202,8 +187,13 @@ class _ClientListViewState extends State<ClientListView> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: Icon(Icons.person, size: 32, color: const Color(0xFF732027)),
-                  title: Text(c.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF591E18))),
-                  subtitle: Text(c.phone, style: const TextStyle(color: Color(0xFF591E18))),
+                  title: Text(c.name,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF591E18))),
+                  subtitle:
+                  Text(c.phone, style: const TextStyle(color: Color(0xFF591E18))),
                   onTap: () => _showClientDetails(c),
                   trailing: const Icon(Icons.chevron_right, color: Color(0xFF732027)),
                 ),
@@ -215,7 +205,8 @@ class _ClientListViewState extends State<ClientListView> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF732027),
         child: const Icon(Icons.person_add, color: Colors.white),
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientFormView())),
+        onPressed: () =>
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const ClientFormView())),
       ),
     );
   }
