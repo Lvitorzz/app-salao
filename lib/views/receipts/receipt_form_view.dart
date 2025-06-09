@@ -201,7 +201,7 @@ class _ReceiptFormViewState extends State<ReceiptFormView> {
                       return ListView.builder(
                         padding: const EdgeInsets.all(8),
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         itemCount: _selected.length,
                         itemBuilder: (_, i) {
                           final sel = _selected[i];
@@ -314,7 +314,7 @@ class _ReceiptFormViewState extends State<ReceiptFormView> {
                       return ListView.builder(
                         padding: const EdgeInsets.all(8),
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         itemCount: _selected.length,
                         itemBuilder: (_, i) {
                           final sel = _selected[i];
@@ -382,8 +382,7 @@ class _ReceiptFormViewState extends State<ReceiptFormView> {
                       0.0,
                           (sum, sel) {
                         if (sel['itemId'] == null) return sum;
-                        final s =
-                        services.firstWhere((s) => s.id == sel['itemId']);
+                        final s = services.firstWhere((s) => s.id == sel['itemId']);
                         return sum + s.price * (sel['qty'] as int);
                       },
                     );
@@ -428,8 +427,7 @@ class _ReceiptFormViewState extends State<ReceiptFormView> {
                   onPressed: _save,
                   child: const Text(
                     'Cadastrar Receita',
-                    style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
